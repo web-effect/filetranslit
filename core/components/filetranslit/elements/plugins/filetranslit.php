@@ -9,7 +9,8 @@
 $currentdoc = $modx->newObject('modResource');
 foreach ($files as &$file) {
 	if ($file['error'] == 0) {
-		$newName = $currentdoc->cleanAlias($file['name']);
+		$newName = '';
+		foreach(explode(".",$file['name']) as $i=>$p)$newName .= ($i>0?'.':'').$currentdoc->cleanAlias($p);
 
 		//file rename logic
 		if ($file['name'] !== $newName) {
@@ -22,6 +23,9 @@ foreach ($files as &$file) {
 			}
 			//transliterate uploaded file
 			$source->renameObject($directory . $file['name'], $newName);
+			//add changed paths back
+			$uploaded = array_keys($source->uploaded_objects,$file['name']);
+			foreach($uploaded as $upload)$source->uploaded_objects[$upload]=$newName;
 		}
 	}
 }
